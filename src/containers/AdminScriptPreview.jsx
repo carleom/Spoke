@@ -22,6 +22,7 @@ export class AdminScriptPreview extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            campaignData:'',
             selectedCampaign:'',
             selectedContact: {},
             customFields: '',
@@ -29,6 +30,16 @@ export class AdminScriptPreview extends React.Component {
             scripts: ''
         };
     };
+
+    componentDidMount() {
+      let campaigns = this.props.data.organization.campaigns.campaigns
+      // Would like to filter campaigns that have already sent messages but this always returns null. Don't know how to fix.
+      //let filteredCampaigns = campaigns.filter(campaign => campaign.completionStats.messagedCount == 0)
+
+      this.setState({
+        campaignData: campaigns
+      })
+    }
 
     handleSelectedContact = (e) => {
         if(e.target.value != '') {
@@ -53,6 +64,7 @@ export class AdminScriptPreview extends React.Component {
     handleSelectedCampaign = (e) => {
         if(e.target.value != ''){
             let campaign = this.props.data.organization.campaigns.campaigns[e.target.value]
+            console.log(campaign)
             this.setState({
                 selectedCampaign: campaign,
                 customFields: campaign.customFields,
@@ -106,6 +118,13 @@ export class AdminScriptPreview extends React.Component {
     const {selectedCampaign} = this.state;
     const {scripts} = this.state;
     const {cannedResponses} = this.state;
+    const {campaignData} = this.state;
+
+    if(!campaignData) {
+      return (
+        <div>loading..</div>
+      )
+    }
 
     return (
         <div>
@@ -113,7 +132,7 @@ export class AdminScriptPreview extends React.Component {
                 <h3 style={{marginRight: "5px"}}>Select a campaign to preview the script of:</h3>
                 <select onChange={this.handleSelectedCampaign}>
                     <option value="">Select a campaign</option>
-                    {this.props.data.organization.campaigns.campaigns.map((campaign, index) => (
+                    {campaignData.map((campaign, index) => (
                         <option key={index} value={index}>{campaign.title}</option>
                     ))}
                 </select>
